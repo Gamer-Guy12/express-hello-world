@@ -1,8 +1,37 @@
 const express = require("express");
+const http = require('https')
+const fs = require('fs')
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
+app.set('view engine', 'ejs')
+
+app.get("/:id", (req, res) =>{
+  
+  http.get(req.query.url, (resp) => {
+
+    let data = ''
+
+    resp.on('data', (chunk) => {
+
+      data += chunk
+
+    })
+
+    resp.on('end', () => {
+
+      fs.writeFileSync('views/page.ejs', data)
+      res.render('page')
+
+    })
+
+  }).on('error', (err) => {
+
+    console.log(err)
+
+  })  
+
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
